@@ -8,7 +8,6 @@
   --text: #0f0;
   --error: #f00;
   --warning: #ff0;
-  --scanline-opacity: 0.15;
 }
 
 * {
@@ -21,21 +20,20 @@ body {
   background-color: #000;
   color: var(--text);
   font-family: "Share Tech Mono", monospace;
-  min-height: 100vh;
+  height: 100vh;
   overflow-x: hidden;
-  position: relative;
+  overflow-y: auto;
 }
 
 .crt {
   position: relative;
-  width: 90%;
-  max-width: 1200px;
-  margin: 0 auto;
   padding: 2rem;
+  max-width: 1200px;
+  margin: auto;
+  box-shadow: 0 0 30px rgba(0, 255, 0, 0.2);
+  background-color: var(--background);
   border-radius: 10px;
-  box-shadow: 0 0 30px rgba(0, 255, 0, 0.3);
-  background-color: #000;
-  z-index: 1;
+  overflow: hidden;
 }
 
 .crt::before {
@@ -45,10 +43,10 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px);
-  background-size: 100% 3px;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%);
+  background-size: 100% 4px;
+  z-index: 2;
   pointer-events: none;
-  z-index: 3;
 }
 
 .crt::after {
@@ -58,20 +56,33 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle, transparent 60%, rgba(0, 0, 0, 0.6));
+  background: radial-gradient(circle at center, transparent 60%, rgba(0, 0, 0, 0.8) 100%);
+  z-index: 3;
   pointer-events: none;
-  z-index: 4;
+}
+
+.system-banner {
+  width: 100%;
+  height: auto;
+  margin: 1rem 0;
+  border: 2px solid var(--primary);
+  filter: brightness(0.8) sepia(100%) hue-rotate(70deg);
+  opacity: 0.7;
 }
 
 .terminal-header {
+  margin-bottom: 1.5rem;
+}
+
+.system-info {
   font-size: 0.9rem;
-  line-height: 1.4;
+  line-height: 1.5;
   z-index: 5;
   position: relative;
 }
 
-.system-info {
-  margin-bottom: 1rem;
+.blink {
+  animation: blink 1s infinite;
 }
 
 .status-fail {
@@ -82,43 +93,24 @@ body {
   color: var(--primary);
 }
 
-.system-banner {
-  width: 100%;
-  height: auto;
-  border: 1px solid var(--primary);
-  filter: brightness(0.8) sepia(100%) hue-rotate(70deg);
-  opacity: 0.75;
-  margin: 1rem 0;
-}
-
-.matrix-bg {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 0;
-  pointer-events: none;
-}
-
 .terminal-content {
   position: relative;
   z-index: 5;
 }
 
-.terminal-output {
-  min-height: 150px;
-  margin-bottom: 1rem;
+.terminal-output p {
+  margin: 0.3rem 0;
 }
 
 .input-line {
   display: flex;
-  align-items: center;
   gap: 0.5rem;
+  margin-top: 1rem;
+  align-items: center;
 }
 
 .prompt {
-  color: var(--primary);
+  white-space: nowrap;
 }
 
 .terminal-input {
@@ -133,22 +125,58 @@ body {
 
 .command-help {
   color: var(--secondary);
+}
+
+.success-message {
+  color: var(--primary);
+  font-weight: bold;
   margin-bottom: 0.5rem;
 }
 
 .error-message {
   color: var(--error);
   font-weight: bold;
-}
-
-.success-message {
-  color: var(--primary);
-  font-weight: bold;
-}
-
-.header {
-  color: var(--primary);
-  font-size: 1.2em;
   margin-bottom: 0.5rem;
-  text-shadow: 0 0 4px var(--primary);
+}
+
+.command-input {
+  color: var(--text);
+  margin-bottom: 0.5rem;
+}
+
+.matrix-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes glitch {
+  0% { transform: translate(2px, 0); }
+  25% { transform: translate(-2px, 0); }
+  50% { transform: translate(2px, 2px); }
+  75% { transform: translate(-2px, -2px); }
+  100% { transform: translate(2px, 0); }
+}
+
+.glitch {
+  animation: glitch 0.3s infinite;
+}
+
+@media (max-width: 768px) {
+  .terminal {
+    padding: 1rem;
+  }
+
+  .system-banner {
+    margin: 0.5rem 0;
+  }
 }
