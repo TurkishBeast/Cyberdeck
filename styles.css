@@ -1,248 +1,331 @@
-document.addEventListener("DOMContentLoaded", () => {
-	// DOM Elements
-	const terminalInput = document.getElementById("terminal-input");
-	const output = document.getElementById("output");
-	const fileInput = document.getElementById("file-input");
-	const modal = document.getElementById("modal");
-	const previewContainer = document.getElementById("preview-container");
+@import url("https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap");
 
-	// Audio elements
-	const keypressSound = document.getElementById("keypress-sound");
-	const accessSound = document.getElementById("access-sound");
-	const errorSound = document.getElementById("error-sound");
-	const decryptSound = document.getElementById("decrypt-sound");
+:root {
+	--primary: #0f0;
+	--primary-dark: #050;
+	--secondary: #0ff;
+	--background: #000;
+	--text: #0f0;
+	--error: #f00;
+	--warning: #ff0;
+	--scanline-opacity: 0.15;
+}
 
-	// Terminal state
-	const state = {
-		date: null,
-		color: "#00ff00",
-		file: null,
-		isProcessing: false
-	};
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
 
-	// Initialize Matrix rain
-	const canvas = document.createElement("canvas");
-	const ctx = canvas.getContext("2d");
-	canvas.width = window.innerWidth;
-	canvas.height = window.innerHeight;
-	document.getElementById("matrix-canvas").appendChild(canvas);
+body {
+	background-color: #111;
+	color: var(--text);
+	font-family: "Share Tech Mono", monospace;
+	height: 100vh;
+	overflow: hidden;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
 
-	const matrix = {
-		chars:
-			"01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン",
-		drops: Array(Math.floor(canvas.width / 20))
-			.fill(0)
-			.map(() => Math.random() * -canvas.height),
+.crt {
+	position: relative;
+	background-color: var(--background);
+	width: 100%;
+	height: 100vh;
+	max-width: 1200px;
+	max-height: 800px;
+	overflow: hidden;
+	border-radius: 10px;
+	box-shadow: 0 0 30px rgba(0, 255, 0, 0.2);
+}
 
-		draw() {
-			ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
-			ctx.fillRect(0, 0, canvas.width, canvas.height);
+.system-banner {
+	width: 100%;
+	height: auto;
+	margin: 1rem 0;
+	border: 2px solid var(--primary);
+	filter: brightness(0.8) sepia(100%) hue-rotate(70deg);
+	opacity: 0.7;
+}
 
-			ctx.fillStyle = "#0f0";
-			ctx.font = "15px monospace";
+.crt::before {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+	background-size: 100% 4px;
+	z-index: 2;
+	pointer-events: none;
+}
 
-			this.drops.forEach((drop, i) => {
-				const char = this.chars[Math.floor(Math.random() * this.chars.length)];
-				ctx.fillText(char, i * 20, drop * 20);
+.crt::after {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: radial-gradient(
+		circle at center,
+		transparent 60%,
+		rgba(0, 0, 0, 0.8) 100%
+	);
+	z-index: 3;
+	pointer-events: none;
+}
 
-				if (drop * 20 > canvas.height && Math.random() > 0.975) {
-					this.drops[i] = 0;
-				} else {
-					this.drops[i]++;
-				}
-			});
+.terminal {
+	position: relative;
+	height: 100%;
+	padding: 2rem;
+	overflow-y: auto;
+}
 
-			requestAnimationFrame(() => this.draw());
-		}
-	};
+.terminal-header {
+	margin-bottom: 2rem;
+}
 
-	matrix.draw();
+.system-info {
+	font-size: 0.9rem;
+	line-height: 1.5;
+}
 
-	// Sound effects
-	const playSound = (type) => {
-		const sounds = {
-			keypress: keypressSound,
-			access: accessSound,
-			error: errorSound,
-			decrypt: decryptSound
-		};
+.blink {
+	animation: blink 1s infinite;
+}
 
-		if (sounds[type]) {
-			sounds[type].volume = 0.3;
-			sounds[type].currentTime = 0;
-			sounds[type].play().catch(() => {});
-		}
-	};
+.status-fail {
+	color: var(--error);
+}
 
-	// Add text to terminal
-	const addToTerminal = (text, className = "") => {
-		const p = document.createElement("p");
-		p.className = className;
-		p.textContent = text;
-		output.appendChild(p);
-		output.scrollTop = output.scrollHeight;
-	};
+.encryption-status {
+	color: var(--primary);
+}
 
-	// Show error message
-	const showError = (message) => {
-		playSound("error");
-		addToTerminal(message, "error-message");
-	};
+.terminal-content {
+	position: relative;
+	z-index: 1;
+}
 
-	// Process date picker command
-	const handleDatePicker = () => {
-		const dateInput = document.createElement("input");
-		dateInput.type = "date";
-		dateInput.className = "picker date-picker";
-		output.appendChild(dateInput);
+.terminal-output {
+	margin-bottom: 1rem;
+	min-height: 200px;
+}
 
-		dateInput.addEventListener("change", () => {
-			state.date = dateInput.value;
-			playSound("access");
-			addToTerminal(`Date set to: ${state.date}`, "success-message");
-			dateInput.remove();
-		});
+.input-line {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
 
-		dateInput.click();
-	};
+.terminal-input {
+	flex: 1;
+	background: transparent;
+	border: none;
+	color: var(--text);
+	font-family: inherit;
+	font-size: inherit;
+	outline: none;
+}
 
-	// Process color picker command
-	const handleColorPicker = () => {
-		const colorInput = document.createElement("input");
-		colorInput.type = "color";
-		colorInput.value = state.color;
-		colorInput.className = "picker color-picker";
-		output.appendChild(colorInput);
+.modal,
+.preview-container {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	background: rgba(0, 0, 0, 0.9);
+	border: 2px solid var(--primary);
+	padding: 1rem;
+	z-index: 100;
+	min-width: 300px;
+}
 
-		colorInput.addEventListener("change", () => {
-			state.color = colorInput.value;
-			document.documentElement.style.setProperty("--primary", state.color);
-			document.documentElement.style.setProperty("--text", state.color);
-			playSound("access");
-			addToTerminal(`Color set to: ${state.color}`, "success-message");
+.modal-header,
+.preview-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 1rem;
+	padding-bottom: 0.5rem;
+	border-bottom: 1px solid var(--primary);
+}
 
-			const preview = document.createElement("div");
-			preview.className = "color-preview";
-			preview.style.backgroundColor = state.color;
-			output.appendChild(preview);
+.close-modal,
+.close-preview {
+	background: none;
+	border: none;
+	color: var(--text);
+	font-size: 1.5rem;
+	cursor: pointer;
+}
 
-			colorInput.remove();
-		});
+.hidden {
+	display: none;
+}
 
-		colorInput.click();
-	};
+.preview-content {
+	max-height: 70vh;
+	overflow: auto;
+}
 
-	// Process file picker command
-	const handleFilePicker = () => {
-		fileInput.click();
-		return new Promise((resolve) => {
-			fileInput.onchange = async () => {
-				if (fileInput.files.length === 0) {
-					await addToTerminal("File upload cancelled", "error-message");
-					resolve();
-					return;
-				}
+.preview-image {
+	max-width: 100%;
+	height: auto;
+}
 
-				const file = fileInput.files[0];
-				state.file = file;
+@keyframes blink {
+	0%,
+	100% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0;
+	}
+}
 
-				const preview = document.createElement("div");
-				preview.className = "file-preview";
-				output.appendChild(preview);
+@keyframes scanline {
+	0% {
+		transform: translateY(-100%);
+	}
+	100% {
+		transform: translateY(100%);
+	}
+}
 
-				await addToTerminal(
-					`Name: ${file.name}\nSize: ${Math.round(file.size / 1024)}KB\nType: ${
-						file.type || "Unknown"
-					}`,
-					""
-				);
+@keyframes glitch {
+	0% {
+		transform: translate(2px, 0);
+	}
+	25% {
+		transform: translate(-2px, 0);
+	}
+	50% {
+		transform: translate(2px, 2px);
+	}
+	75% {
+		transform: translate(-2px, -2px);
+	}
+	100% {
+		transform: translate(2px, 0);
+	}
+}
 
-				if (file.type.startsWith("image/")) {
-					const img = document.createElement("img");
-					img.src = URL.createObjectURL(file);
-					img.className = "preview-image";
-					preview.appendChild(img);
-				}
+.glitch {
+	animation: glitch 0.3s infinite;
+}
 
-				playSound("access");
-				resolve();
-			};
-		});
-	};
+.command-help {
+	color: var(--secondary);
+	margin-bottom: 4px;
+}
 
-	// Available commands
-	const commands = {
-		help: () => {
-			addToTerminal("Available commands:", "help-header");
-			addToTerminal("/date - Open date picker", "command-help");
-			addToTerminal("/color - Open color picker", "command-help");
-			addToTerminal("/file - Open file picker", "command-help");
-			addToTerminal("/clear - Clear terminal", "command-help");
-			addToTerminal("/status - Show current selections", "command-help");
-		},
+.error-message {
+	color: var(--error);
+	font-weight: bold;
+	margin-bottom: 8px;
+}
 
-		date: handleDatePicker,
-		color: handleColorPicker,
-		file: handleFilePicker,
+.success-message {
+	color: var(--primary);
+	font-weight: bold;
+	margin-bottom: 8px;
+}
 
-		clear: () => {
-			output.innerHTML = "";
-			addToTerminal("Terminal cleared. Type /help for commands.", "command-help");
-		},
+.file-preview {
+	margin: 10px 0;
+	padding: 10px;
+	border: 1px solid var(--primary);
+	background: rgba(0, 255, 0, 0.1);
+}
 
-		status: () => {
-			addToTerminal("=== CURRENT SELECTIONS ===", "status-header");
-			addToTerminal(`Date: ${state.date || "Not set"}`, "status-item");
-			addToTerminal(`Color: ${state.color}`, "status-item");
-			addToTerminal(
-				`File: ${state.file ? state.file.name : "Not selected"}`,
-				"status-item"
-			);
-		}
-	};
+.file-preview img {
+	max-width: 100%;
+	height: auto;
+	display: block;
+	margin: 0 auto;
+}
 
-	// Command processor
-	const processCommand = (input) => {
-		if (state.isProcessing) return;
-		state.isProcessing = true;
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+	.blink,
+	.glitch,
+	.scanline {
+		animation: none;
+	}
+}
 
-		const command = input.toLowerCase().trim();
-		if (!command) return;
+/* Responsive Design */
+@media (max-width: 768px) {
+	.terminal {
+		padding: 1rem;
+	}
 
-		addToTerminal(`> ${input}`, "command-input");
+	.system-banner {
+		margin: 0.5rem 0;
+	}
+}
 
-		if (command.startsWith("/")) {
-			const cmd = command.slice(1);
-			if (commands[cmd]) {
-				commands[cmd]();
-			} else {
-				showError(`Unknown command: ${command}`);
-			}
-		} else {
-			showError("Commands must start with /");
-		}
-		state.isProcessing = false;
-		terminalInput.focus();
-	};
+.picker {
+	margin: 10px 0;
+	padding: 5px;
+	background: var(--background);
+	border: 1px solid var(--primary);
+	color: var(--text);
+	font-family: "Share Tech Mono", monospace;
+}
 
-	// Event listeners
-	terminalInput.addEventListener("keydown", (e) => {
-		if (e.key === "Enter" && !state.isProcessing) {
-			const command = terminalInput.value.trim();
-			if (command) {
-				processCommand(command);
-				terminalInput.value = "";
-			}
-		} else {
-			playSound("keypress");
-		}
-	});
+.date-picker {
+	color-scheme: dark;
+}
 
-	// Initialize
-	addToTerminal("CYBERDECK TERMINAL v2.25.2", "header");
-	addToTerminal("Type /help for available commands", "command-help");
-	terminalInput.focus();
-	window.addEventListener("click", () => {
-		if (!state.isProcessing) terminalInput.focus();
-	});
-});
+.color-picker {
+	height: 40px;
+	width: 100px;
+}
+
+.file-picker {
+	width: 100%;
+	max-width: 300px;
+}
+
+.color-preview {
+	width: 100%;
+	height: 30px;
+	margin: 10px 0;
+	border: 1px solid var(--primary);
+}
+
+.command-input {
+	color: var(--text);
+	margin-bottom: 8px;
+}
+
+.status-header {
+	color: var(--secondary);
+	margin: 10px 0;
+	padding-bottom: 5px;
+	border-bottom: 1px solid var(--primary);
+}
+
+.status-item {
+	margin: 5px 0;
+	padding-left: 10px;
+}
+
+.help-header {
+	color: var(--secondary);
+	margin: 10px 0;
+	font-weight: bold;
+}
+
+.header {
+	color: var(--primary);
+	font-size: 1.2em;
+	margin-bottom: 10px;
+	text-shadow: 0 0 5px var(--primary);
+}
