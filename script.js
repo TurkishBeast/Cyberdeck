@@ -74,6 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		}
 	};
 
+	// Add text to terminal
 	const addToTerminal = (text, className = "") => {
 		const p = document.createElement("p");
 		p.className = className;
@@ -82,11 +83,13 @@ document.addEventListener("DOMContentLoaded", () => {
 		output.scrollTop = output.scrollHeight;
 	};
 
+	// Show error message
 	const showError = (message) => {
 		playSound("error");
 		addToTerminal(message, "error-message");
 	};
 
+	// Process date picker command
 	const handleDatePicker = () => {
 		const dateInput = document.createElement("input");
 		dateInput.type = "date";
@@ -103,6 +106,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		dateInput.click();
 	};
 
+	// Process color picker command
 	const handleColorPicker = () => {
 		const colorInput = document.createElement("input");
 		colorInput.type = "color";
@@ -128,6 +132,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		colorInput.click();
 	};
 
+	// Process file picker command
 	const handleFilePicker = () => {
 		fileInput.click();
 		return new Promise((resolve) => {
@@ -146,7 +151,9 @@ document.addEventListener("DOMContentLoaded", () => {
 				output.appendChild(preview);
 
 				await addToTerminal(
-					`Name: ${file.name}\nSize: ${Math.round(file.size / 1024)}KB\nType: ${file.type || "Unknown"}`,
+					`Name: ${file.name}\nSize: ${Math.round(file.size / 1024)}KB\nType: ${
+						file.type || "Unknown"
+					}`,
 					""
 				);
 
@@ -163,6 +170,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		});
 	};
 
+	// Available commands
 	const commands = {
 		help: () => {
 			addToTerminal("Available commands:", "help-header");
@@ -172,21 +180,28 @@ document.addEventListener("DOMContentLoaded", () => {
 			addToTerminal("/clear - Clear terminal", "command-help");
 			addToTerminal("/status - Show current selections", "command-help");
 		},
+
 		date: handleDatePicker,
 		color: handleColorPicker,
 		file: handleFilePicker,
+
 		clear: () => {
 			output.innerHTML = "";
 			addToTerminal("Terminal cleared. Type /help for commands.", "command-help");
 		},
+
 		status: () => {
 			addToTerminal("=== CURRENT SELECTIONS ===", "status-header");
 			addToTerminal(`Date: ${state.date || "Not set"}`, "status-item");
 			addToTerminal(`Color: ${state.color}`, "status-item");
-			addToTerminal(`File: ${state.file ? state.file.name : "Not selected"}`, "status-item");
+			addToTerminal(
+				`File: ${state.file ? state.file.name : "Not selected"}`,
+				"status-item"
+			);
 		}
 	};
 
+	// Command processor
 	const processCommand = (input) => {
 		if (state.isProcessing) return;
 		state.isProcessing = true;
@@ -210,6 +225,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		terminalInput.focus();
 	};
 
+	// Event listeners
 	terminalInput.addEventListener("keydown", (e) => {
 		if (e.key === "Enter" && !state.isProcessing) {
 			const command = terminalInput.value.trim();
@@ -222,6 +238,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		}
 	});
 
+	// Initialize
 	addToTerminal("CYBERDECK TERMINAL v2.25.2", "header");
 	addToTerminal("Type /help for available commands", "command-help");
 	terminalInput.focus();
