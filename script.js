@@ -146,9 +146,7 @@ document.addEventListener("DOMContentLoaded", () => {
 				output.appendChild(preview);
 
 				await addToTerminal(
-					`Name: ${file.name}\nSize: ${Math.round(file.size / 1024)}KB\nType: ${
-						file.type || "Unknown"
-					}`,
+					`Name: ${file.name}\nSize: ${Math.round(file.size / 1024)}KB\nType: ${file.type || "Unknown"}`,
 					""
 				);
 
@@ -185,10 +183,7 @@ document.addEventListener("DOMContentLoaded", () => {
 			addToTerminal("=== CURRENT SELECTIONS ===", "status-header");
 			addToTerminal(`Date: ${state.date || "Not set"}`, "status-item");
 			addToTerminal(`Color: ${state.color}`, "status-item");
-			addToTerminal(
-				`File: ${state.file ? state.file.name : "Not selected"}`,
-				"status-item"
-			);
+			addToTerminal(`File: ${state.file ? state.file.name : "Not selected"}`, "status-item");
 		}
 	};
 
