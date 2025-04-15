@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cyberdeck Terminal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0f0;
+      --error: #f00;
+      --background: #000;
+      --text: #0f0;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background-color: var(--background);
+      color: var(--text);
+      font-family: 'Share Tech Mono', monospace;
+      overflow: hidden;
+    }
+    .crt {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: black;
+    }
+    canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+    }
+    .terminal {
+      position: relative;
+      z-index: 1;
+      background: rgba(0,0,0,0.8);
+      box-shadow: 0 0 20px var(--primary);
+      padding: 20px;
+      width: 90%;
+      max-width: 800px;
+    }
+    .output p {
+      margin: 5px 0;
+    }
+    .prompt-line {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-family: inherit;
+      flex: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="crt">
+    <canvas id="matrix"></canvas>
+    <div class="terminal">
+      <div class="output" id="output">
+        <p>> INITIALIZING SYSTEM…</p>
+        <p>> LOADING KERNEL MODULES…</p>
+        <p>> ESTABLISHING SECURE CONNECTION…</p>
+        <p>> BYPASSING FIREWALL…</p>
+        <p>> ACCESS GRANTED</p>
+        <p>> TYPE "anasayfa" TO PROCEED.</p>
+      </div>
+      <div class="prompt-line">
+        <span>root@cyberdeck:~$</span>
+        <input type="text" id="terminal-input" autofocus>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Matrix effect
+    const canvas = document.getElementById('matrix');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const chars = "01アイウエオカキクケコサシスセソタチツテトナニヌネノ";
+    const fontSize = 14;
+    const columns = canvas.width / fontSize;
+    const drops = Array.from({ length: columns }, () => 1);
+
+    function drawMatrix() {
+      ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#0F0";
+      ctx.font = fontSize + "px monospace";
+      for (let i = 0; i < drops.length; i++) {
+        const char = chars.charAt(Math.floor(Math.random() * chars.length));
+        ctx.fillText(char, i * fontSize, drops[i] * fontSize);
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+        drops[i]++;
+      }
+    }
+    setInterval(drawMatrix, 33);
+
+    // Terminal input logic
+    const input = document.getElementById("terminal-input");
+    const output = document.getElementById("output");
+    input.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") {
+        const val = input.value.trim();
+        const p = document.createElement("p");
+        p.textContent = `> ${val}`;
+        output.appendChild(p);
+        if (val === "anasayfa") {
+          window.location.href = "/ana-sayfa";
+        } else if (val === "help") {
+          const help = document.createElement("p");
+          help.textContent = "> Komutlar: anasayfa, help";
+          output.appendChild(help);
+        } else {
+          const err = document.createElement("p");
+          err.textContent = "> Bilinmeyen komut!";
+          err.style.color = "red";
+          output.appendChild(err);
+        }
+        input.value = "";
+        output.scrollTop = output.scrollHeight;
+      }
+    });
+  </script>
+</body>
+</html>
