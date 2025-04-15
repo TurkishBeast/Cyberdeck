@@ -1,138 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cyberdeck Terminal</title>
-  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --primary: #0f0;
-      --error: #f00;
-      --background: #000;
-      --text: #0f0;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      background-color: var(--background);
-      color: var(--text);
-      font-family: 'Share Tech Mono', monospace;
-      overflow: hidden;
-    }
-    .crt {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: black;
-    }
-    canvas {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw;
-      height: 100vh;
-      z-index: 0;
-    }
-    .terminal {
-      position: relative;
-      z-index: 1;
-      background: rgba(0,0,0,0.8);
-      box-shadow: 0 0 20px var(--primary);
-      padding: 20px;
-      width: 90%;
-      max-width: 800px;
-    }
-    .output p {
-      margin: 5px 0;
-    }
-    .prompt-line {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-    input {
-      background: transparent;
-      border: none;
-      outline: none;
-      color: var(--text);
-      font-family: inherit;
-      flex: 1;
-    }
-  </style>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>CyberDeck Terminal</title>
+	<link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
-  <div class="crt">
-    <canvas id="matrix"></canvas>
-    <div class="terminal">
-      <div class="output" id="output">
-        <p>> INITIALIZING SYSTEM…</p>
-        <p>> LOADING KERNEL MODULES…</p>
-        <p>> ESTABLISHING SECURE CONNECTION…</p>
-        <p>> BYPASSING FIREWALL…</p>
-        <p>> ACCESS GRANTED</p>
-        <p>> TYPE "anasayfa" TO PROCEED.</p>
-      </div>
-      <div class="prompt-line">
-        <span>root@cyberdeck:~$</span>
-        <input type="text" id="terminal-input" autofocus>
-      </div>
-    </div>
-  </div>
+	<div class="crt">
+		<div class="scanline"></div>
+		<div class="noise"></div>
+		<div class="terminal">
+			<div class="terminal-header">
+				<div class="system-info">
+					<div class="blink">SYSTEM v2.25.2</div>
+					<div>SECURE CONNECTION: <span class="status-fail">FAILED</span></div>
+					<div>ENCRYPTION: <span class="encryption-status">ACTIVE</span></div>
+					<img src="https://picsum.photos/seed/cyber/800/200" alt="System Banner" class="system-banner">
+				</div>
+			</div>
 
-  <script>
-    // Matrix effect
-    const canvas = document.getElementById('matrix');
-    const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    const chars = "01アイウエオカキクケコサシスセソタチツテトナニヌネノ";
-    const fontSize = 14;
-    const columns = canvas.width / fontSize;
-    const drops = Array.from({ length: columns }, () => 1);
+			<div class="matrix-bg" id="matrix-canvas"></div>
 
-    function drawMatrix() {
-      ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = "#0F0";
-      ctx.font = fontSize + "px monospace";
-      for (let i = 0; i < drops.length; i++) {
-        const char = chars.charAt(Math.floor(Math.random() * chars.length));
-        ctx.fillText(char, i * fontSize, drops[i] * fontSize);
-        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-          drops[i] = 0;
-        }
-        drops[i]++;
-      }
-    }
-    setInterval(drawMatrix, 33);
+			<div class="terminal-content">
+				<div id="output" class="terminal-output">
+					<div class="boot-sequence">
+						<p>> INITIALIZING SYSTEM...</p>
+						<p>> LOADING KERNEL MODULES...</p>
+						<p>> ESTABLISHING SECURE CONNECTION...</p>
+						<p>> BYPASSING FIREWALL...</p>
+						<p>> ACCESS GRANTED</p>
+						<p class="command-help">> TYPE /help FOR AVAILABLE COMMANDS</p>
+					</div>
+				</div>
 
-    // Terminal input logic
-    const input = document.getElementById("terminal-input");
-    const output = document.getElementById("output");
-    input.addEventListener("keydown", function (e) {
-      if (e.key === "Enter") {
-        const val = input.value.trim();
-        const p = document.createElement("p");
-        p.textContent = `> ${val}`;
-        output.appendChild(p);
-        if (val === "anasayfa") {
-          window.location.href = "/ana-sayfa";
-        } else if (val === "help") {
-          const help = document.createElement("p");
-          help.textContent = "> Komutlar: anasayfa, help";
-          output.appendChild(help);
-        } else {
-          const err = document.createElement("p");
-          err.textContent = "> Bilinmeyen komut!";
-          err.style.color = "red";
-          output.appendChild(err);
-        }
-        input.value = "";
-        output.scrollTop = output.scrollHeight;
-      }
-    });
-  </script>
+				<div class="input-line">
+					<span class="prompt">root@cyberdeck:~$</span>
+					<input type="text" id="terminal-input" class="terminal-input" autofocus spellcheck="false" aria-label="Terminal input">
+				</div>
+			</div>
+
+			<div id="file-input-container" class="hidden">
+				<input type="file" id="file-input" aria-label="File upload">
+			</div>
+
+			<div id="modal" class="modal hidden" role="dialog" aria-labelledby="modal-title">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h2 id="modal-title">SYSTEM ALERT</h2>
+						<button class="close-modal" aria-label="Close modal">&times;</button>
+					</div>
+					<div id="modal-body" class="modal-body"></div>
+				</div>
+			</div>
+
+			<div id="preview-container" class="preview-container hidden" role="dialog" aria-labelledby="preview-title">
+				<div class="preview-header">
+					<h3 id="preview-title">FILE PREVIEW</h3>
+					<button class="close-preview" aria-label="Close preview">&times;</button>
+				</div>
+				<div id="preview-content" class="preview-content"></div>
+			</div>
+		</div>
+	</div>
+
+	<audio id="keypress-sound" src="https://assets.codepen.io/t-1/key-press.mp3" preload="auto"></audio>
+	<audio id="access-sound" src="https://assets.codepen.io/t-1/access-granted.mp3" preload="auto"></audio>
+	<audio id="error-sound" src="https://assets.codepen.io/t-1/error.mp3" preload="auto"></audio>
+	<audio id="decrypt-sound" src="https://assets.codepen.io/t-1/decrypt.mp3" preload="auto"></audio>
+
+	<script src="script.js"></script>
 </body>
+
 </html>
+
