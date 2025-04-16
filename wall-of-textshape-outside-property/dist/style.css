@@ -1,0 +1,34 @@
+body{
+  height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#f2f2f2;
+}
+.container{
+  height:400px;
+  width:775px;
+}
+img{
+  float: right;
+  width: 600px;
+  shape-outside: url( https://gistcdn.githack.com/AnniePawl/edd53a65352d9fdaa8f843d445eb5f13/raw/9c57b939f9afd1f5ad411cc1d91fb3c301338ef7/shark.svg);
+  shape-margin:8px;
+  margin-right: -225px;
+  margin-bottom: 0;
+  margin-left:8px;
+}
+p{
+  color:#332d1d;
+  text-align:justify;
+  font-family:sans-serif;
+  letter-spacing:.45px;
+  font-size:10px;
+  line-height:9px;
+  max-width:675px;
+}
+@media screen and (max-width: 1000px) {
+  .container{
+    transform:scale(.57);
+  }
+}

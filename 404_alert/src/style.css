@@ -1,0 +1,287 @@
+/* Reset and base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Courier New', monospace;
+    background-color: #0a0a0a;
+    color: #e0e0e0;
+    overflow: hidden;
+    position: relative;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Accessibility - reduced motion option */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* Background glitch effect */
+.glitch-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.15),
+        rgba(0, 0, 0, 0.15) 1px,
+        transparent 1px,
+        transparent 2px
+    );
+    pointer-events: none;
+    z-index: -1;
+    animation: bgShift 8s infinite;
+}
+
+@keyframes bgShift {
+    0%, 100% { background-position: 0 0; }
+    25% { background-position: 20px -20px; }
+    50% { background-position: -20px 20px; }
+    75% { background-position: 20px 20px; }
+}
+
+/* Main container */
+.container {
+    width: 90%;
+    max-width: 800px;
+    text-align: center;
+    z-index: 1;
+    padding: 2rem;
+    border: 2px solid #ff0033;
+    box-shadow: 
+        0 0 10px #ff0033,
+        0 0 20px rgba(255, 0, 51, 0.5) inset;
+    position: relative;
+    animation: containerPulse 4s infinite;
+}
+
+@keyframes containerPulse {
+    0%, 100% { box-shadow: 0 0 10px #ff0033, 0 0 20px rgba(255, 0, 51, 0.5) inset; }
+    50% { box-shadow: 0 0 20px #ff0033, 0 0 40px rgba(255, 0, 51, 0.7) inset; }
+}
+
+/* 404 Error text */
+.error-code {
+    font-size: 8rem;
+    font-weight: bold;
+    color: #ff0033;
+    text-shadow: 
+        0 0 10px #ff0033,
+        0 0 20px #ff0033,
+        0 0 30px #ff0033;
+    margin-bottom: 1rem;
+    position: relative;
+    animation: errorFlicker 0.5s infinite alternate;
+}
+
+@keyframes errorFlicker {
+    0%, 18%, 22%, 25%, 53%, 57%, 100% {
+        text-shadow: 0 0 10px #ff0033, 0 0 20px #ff0033, 0 0 30px #ff0033;
+    }
+    20%, 24%, 55% { 
+        text-shadow: none;
+    }
+}
+
+/* Error message */
+.error-message {
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    position: relative;
+}
+
+.error-message:after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(10, 10, 10, 0.5);
+    animation: textGlitch 3s infinite;
+    clip-path: inset(0 0 0 0);
+}
+
+@keyframes textGlitch {
+    0%, 100% { clip-path: inset(0 0 0 0); }
+    5% { clip-path: inset(33% 0 66% 0); }
+    15% { clip-path: inset(50% 0 50% 0); }
+    20% { clip-path: inset(10% 0 70% 0); }
+    25% { clip-path: inset(0 0 0 0); }
+    30% { clip-path: inset(80% 0 10% 0); }
+    35% { clip-path: inset(0 0 0 0); }
+    40% { clip-path: inset(40% 0 60% 0); }
+    45% { clip-path: inset(0 0 0 0); }
+}
+
+/* Console warnings */
+.console-warnings {
+    background-color: rgba(0, 0, 0, 0.7);
+    border: 1px solid #ff0033;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    font-family: 'Courier New', monospace;
+    text-align: left;
+    max-height: 150px;
+    overflow-y: auto;
+    width: 100%;
+}
+
+.warning-line {
+    margin-bottom: 0.5rem;
+    color: #ffcc00;
+    animation: warningFlicker 3s infinite;
+}
+
+@keyframes warningFlicker {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+/* Countdown timer */
+.countdown-container {
+    margin-bottom: 2rem;
+}
+
+.countdown-label {
+    font-size: 1.2rem;
+    color: #ff0033;
+    margin-bottom: 0.5rem;
+    animation: countdownPulse 1s infinite;
+}
+
+@keyframes countdownPulse {
+    0%, 100% { color: #ff0033; }
+    50% { color: #ff6666; }
+}
+
+.countdown-timer {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #ffffff;
+    text-shadow: 0 0 10px #ff0033;
+}
+
+/* Abort button */
+.abort-button {
+    background-color: #ff0033;
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    font-size: 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    box-shadow: 0 0 20px #ff0033;
+}
+
+.abort-button:hover {
+    background-color: #ff3355;
+    transform: scale(1.05);
+    box-shadow: 0 0 30px #ff0033;
+}
+
+.abort-button:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255, 0, 51, 0.5);
+}
+
+.abort-button:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.4),
+        transparent
+    );
+    transition: all 0.6s;
+}
+
+.abort-button:hover:before {
+    left: 100%;
+}
+
+/* Scanlines effect */
+.scanlines {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        to bottom,
+        transparent 50%,
+        rgba(0, 0, 0, 0.1) 50%
+    );
+    background-size: 100% 4px;
+    z-index: 2;
+    pointer-events: none;
+    opacity: 0.3;
+}
+
+/* Accessibility note */
+.accessibility-note {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 0.8rem;
+    z-index: 10;
+}
+
+.accessibility-toggle {
+    background: none;
+    border: 1px solid #e0e0e0;
+    color: #e0e0e0;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+.calm-mode {
+    animation: none !important;
+    transition: none !important;
+}
+
+.calm-mode .glitch-bg,
+.calm-mode .scanlines,
+.calm-mode .error-code,
+.calm-mode .error-message:after,
+.calm-mode .warning-line {
+    animation: none !important;
+}
+
+.calm-mode .container {
+    animation: none !important;
+    box-shadow: 0 0 10px #ff0033;
+}
+
+.calm-mode .countdown-label {
+    animation: none !important;
+    color: #ff0033;
+}
